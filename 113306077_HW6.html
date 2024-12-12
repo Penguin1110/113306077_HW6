@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>113306077_HW6_1A2B</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        #game-container {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .guess-log {
+            border-bottom: 1px solid #5bc6ff;
+            padding: 5px 0;
+        }
+        button {
+            background-color: #89e9ff; 
+            color: rgb(0, 0, 0); /* 按鈕文字顏色 */
+            border: none; 
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        button:hover {
+            background-color: #76ccf1; /* 滑鼠懸停時變色 */
+        }
+    </style>
+</head>
+<body>
+    <h1>113306077_HW6_1A2B</h1>
+
+    <div id="game-container">
+        <p>請輸入一組 4 位數字（不能重複）：</p>
+        <input type="text" id="userInput" maxlength="4" placeholder="例如：1234">
+        <button onclick="checkGuess()">猜猜看!</button>
+
+        <div id="result">
+            <h3>猜測結果：</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+
+        //煙火功能
+        function launchFireworks() {
+            const duration = 2 * 1000; // 2 秒
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+
+
+
+        function generateAnswer() {
+            let numbers = [0,1,2,3,4,5,6,7,8,9]; // 0~9 的數字陣列
+            let answer = [];
+            for (let i = 0; i < 4; i++) {
+                let randomIndex = Math.floor(Math.random() * numbers.length);
+                answer.push(numbers[randomIndex]);
+                numbers.splice(randomIndex, 1);
+            }
+            return answer;
+        }
+
+        const answer = generateAnswer(); 
+        let attempts = 0;
+
+
+        function checkGuess() {
+            const userInput = document.getElementById("userInput").value;
+            const logDiv = document.getElementById("log");
+
+            // 驗證輸入
+            if (!/^\d{4}$/.test(userInput)) {
+                alert("請輸入 4 個不重複的數字！");
+                triggerShake(userInput);
+                return;
+            }
+            
+
+            const userArray = userInput.split("").map(Number);
+            if (new Set(userArray).size !== 4) {
+                alert("數字不能重複！");
+                triggerShake(userInput);
+                return;
+            }
+
+            
+            let A = 0, B = 0;
+            for(let i = 0;i<4;i++) {
+                if(userArray[i] === answer[i]) {
+                    A++;
+                } else if(answer.includes(userArray[i])) {
+                    B++;
+                }
+            }
+
+            attempts++;
+
+            // 顯示猜測結果
+            const logEntry = document.createElement("div");
+            logEntry.className = "guess-log";
+            logEntry.textContent = `第 ${attempts} 次：${userInput} → ${A}A${B}B`;
+            logDiv.appendChild(logEntry);
+            if(attempts >=15) {
+                logEntry.textContent = `第 ${attempts} 次：${userInput} → ${A}A${B}B        雜魚<3 雜魚<3`;
+            }
+            
+            if (A === 4) {
+
+                alert(`答對！答案是 ${answer.join("")}，共猜了 ${attempts} 次！`);
+                launchFireworks();
+                document.getElementById("userInput").disabled = true; 
+                return;
+            }
+
+            // 清空輸入框
+            document.getElementById("userInput").value = "";
+        }
+        //直接測試結果
+        console.log("謎底:", answer.join(""));
+        console.log("好孩子不可以偷看喔");
+        //                oo0oo
+        //				o8888888o
+        //				88" . "88
+        //				(| -_- |)
+        //				0\  =  /0
+        //	  		  ___/`---'\___
+        //		    .' \\|     |// '.
+        // 		   / \\|||  :  |||// \
+        //		  / _||||| -:- |||||- \
+        //		 |   | \\\  -  /// |   |
+        //		 | \_|  ''\---/''  |_/ |
+        //		 \  .-\__  '-'  ___/-. /
+        //	   ___'. .'  /--.--\  `. .'___
+        //	."" '<  `.___\_<|>_/___.' >' "".
+        // | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+        // \  \ `_.   \_ __\ /__ _/   .-` /  /
+        //=====`-.____`.___ \_____/___.-`___.-'=====
+    </script>
+</body>
+</html>
